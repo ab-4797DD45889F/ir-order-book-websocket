@@ -1,41 +1,20 @@
 ﻿using IndependentReserve.DotNetClientApi.Data;
-using IrOrderBook.Data;
 using IrOrderBook.Services;
-using System.Text.Json;
 
-const CurrencyCode primary = CurrencyCode.Xbt;
+const CurrencyCode primary = CurrencyCode.Usdt;
 const CurrencyCode secondary = CurrencyCode.Aud;
 
-var apiClientService = new ApiClientService();
+var broadcastService = new ConsoleBroadcastService(); // this will be the real websocket broadcast service
 
-var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-OrderBookWrapper orderBook = null;
-// todo: turn it into an infinite loop and exit on pressing Enter key in console (Console.ReadLine())
+var trackingService = new SingleOrderBookTrackingService(primary, secondary, broadcastService);
 
-for (var i = 0; i < 10; i++)
-{
-    var newOrderBook = await apiClientService.GetOrderBook(primary, secondary);
+Console.WriteLine("Press Enter to quit...");
 
-    var newOrderBookWrapper = new OrderBookWrapper(timestamp, newOrderBook);
-    Console.WriteLine(newOrderBookWrapper);
-
-    if (orderBook != null)
-    {
-        var difference = OrderBookDifference.Get(timestamp, orderBook.Original, newOrderBook);
-        Console.WriteLine(difference);
-
-        // Writing difference object as JSON
-        var differenceJson = JsonSerializer.Serialize(difference);
-        Console.WriteLine(differenceJson);
-    }
-
-    orderBook = newOrderBookWrapper;
-    timestamp++;
-
-    Console.WriteLine();
-    Thread.Sleep(TimeSpan.FromSeconds(1));
-}
+var cts = new CancellationTokenSource();
+Task.Run(() => trackingService.Start(cts.Token));
+Console.ReadLine();
+cts.Cancel();
 
 // todo: add metrics to see how long it takes to update the order book
 
-// todo: move the project one level up and re-commit everything again
+// todo: potential optimisation is to track only first pages of the order book
