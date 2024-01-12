@@ -18,6 +18,8 @@ public class OrderBookDifference
 
     public override string ToString() => $"Diff{Primary}{Secondary}: {Index}: {BuyOrders.Length} buy orders and {SellOrders.Length} sell orders";
 
+    // todo: move this to OrderBookService
+
     public static OrderBookDifference Get(long index, OrderBook left, OrderBook right)
     {
         // todo: make sure that left and right are not null

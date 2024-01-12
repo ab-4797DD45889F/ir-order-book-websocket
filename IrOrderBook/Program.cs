@@ -37,3 +37,5 @@ for (var i = 0; i < 10; i++)
 }
 
 // todo: add metrics to see how long it takes to update the order book
+
+// todo: move the project one level up and re-commit everything again
