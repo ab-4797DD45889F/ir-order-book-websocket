@@ -1,11 +1,10 @@
-﻿using IndependentReserve.DotNetClientApi.Data;
-using IrOrderBook.Data;
+﻿using IrOrderBook.Data;
 
 namespace IrOrderBook.Services;
 
 public class OrderBookService
 {
-    public OrderBookDifference GetDifference(long index, OrderBook left, OrderBook right)
+    public OrderBookDifference GetDifference(long index, OrderBookDto left, OrderBookDto right)
     {
         // make sure that left and right are not null
         if (left == null || right == null)
@@ -14,22 +13,22 @@ public class OrderBookService
         }
 
         // make sure that primary and secondary currency codes match for left and right order books, because otherwise we can't calculate the difference
-        if (left.PrimaryCurrencyCode != right.PrimaryCurrencyCode || left.SecondaryCurrencyCode != right.SecondaryCurrencyCode)
+        if (left.Primary != right.Primary || left.Secondary != right.Secondary)
         {
             throw new ArgumentException("Primary and Secondary currency codes do not match for the left and right order books");
         }
 
         var diff = new OrderBookDifference();
-        diff.Index = index;
+        diff.Nonce = index;
 
-        diff.Primary = left.PrimaryCurrencyCode;
-        diff.Secondary = right.SecondaryCurrencyCode;
+        diff.Primary = left.Primary;
+        diff.Secondary = right.Primary;
         diff.BuyOrders = GetDifferenceForCollection(left.BuyOrders, right.BuyOrders);
         diff.SellOrders = GetDifferenceForCollection(left.SellOrders, right.SellOrders);
         return diff;
     }
 
-    private static OrderBookDifferenceItem[] GetDifferenceForCollection(List<OrderBookItem> leftOrders, List<OrderBookItem> rightOrders)
+    private static OrderBookDtoItem[] GetDifferenceForCollection(OrderBookDtoItem[] leftOrders, OrderBookDtoItem[] rightOrders)
     {
         // Convert the 'left' and 'right' orders to dictionaries for easier lookup
         var leftDict = leftOrders.ToDictionary(x => x.Price, x => x.Volume);
@@ -54,7 +53,7 @@ public class OrderBookService
         }
 
         // Convert the difference dictionary back to a set of Orders
-        var differenceSet = difference.Select(p => new OrderBookDifferenceItem { Price = p.Key, Volume = p.Value }).ToArray();
+        var differenceSet = difference.Select(p => new OrderBookDtoItem { Price = p.Key, Volume = p.Value }).ToArray();
         return differenceSet;
     }
 }
