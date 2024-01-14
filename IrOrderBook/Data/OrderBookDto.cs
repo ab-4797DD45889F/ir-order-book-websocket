@@ -1,4 +1,6 @@
-﻿namespace IrOrderBook.Data;
+﻿using System.Text.Json.Serialization;
+
+namespace IrOrderBook.Data;
 
 /// <summary>
 /// Short version of the order book that we receive from the API.
@@ -9,6 +11,7 @@ public class OrderBookDto
     /// <summary>
     /// The version of the order book.
     /// </summary>
+    [JsonPropertyName("n")]
     public long Nonce { get; set; }
 
     /// <summary>

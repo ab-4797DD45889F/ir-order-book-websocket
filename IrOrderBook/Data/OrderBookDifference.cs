@@ -13,6 +13,7 @@ public class OrderBookDifference
     /// The latest order book version.
     /// Order Book [Nonce -1] + Difference [Nonce] = Order Book [Nonce]
     /// </summary>
+    [JsonPropertyName("n")]
     public long Nonce { get; set; }
 
     /// <summary>
@@ -35,6 +36,7 @@ public class OrderBookDifference
     /// Positive volume means that more volume is available for this price.
     /// Negative volume means that less volume is available for this price.
     /// </summary>
+    [JsonPropertyName("b")]
     public OrderBookDtoItem[] BuyOrders { get; set; }
 
     /// <summary>
@@ -43,6 +45,7 @@ public class OrderBookDifference
     /// Positive volume means that more volume is available for this price.
     /// Negative volume means that less volume is available for this price.
     /// </summary>
+    [JsonPropertyName("s")]
     public OrderBookDtoItem[] SellOrders { get; set; }
 
     public override string ToString() => $"Diff{Primary}{Secondary}: {Nonce}: {BuyOrders.Length} buy orders and {SellOrders.Length} sell orders";

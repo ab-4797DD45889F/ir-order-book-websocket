@@ -1,0 +1,6 @@
+@IrOrderBookWebApplication_HostAddress = http://localhost:5282
+
+GET {{IrOrderBookWebApplication_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
