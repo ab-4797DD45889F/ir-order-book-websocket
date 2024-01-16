@@ -6,21 +6,36 @@ function init() {
     getOrderBook();
 }
 
+function print(message) {
+    console.log(message);
+
+    const divOutput= document.getElementById('output');
+
+    if (!divOutput) {
+        console.log("output couldn't be found");
+        return;
+    }
+
+    const child = document.createElement('pre');
+    child.innerText = message;
+    divOutput.insertBefore(child, divOutput.firstChild);
+}
+
 // subscribing for order book updates
 function subscribeForUpdates(){
     // this will now work until we get
-    const ws = new WebSocket("wss://localhost:7253/ws");
+    const ws = new WebSocket("wss://localhost:7253/ws?name=ab");
     ws.onopen = function () {
-        console.log("websocket connection opened");
+        print("websocket connection opened");
     }
 
     ws.onmessage = function (evt) {
         const orderBookUpdate = evt.data;
-        console.log("update received >>", orderBookUpdate);
+        print("update received >>" + orderBookUpdate);
     }
 
     ws.onclose = function () {
-        console.log("websocket connection closed");
+        print("websocket connection closed");
     }
 }
 

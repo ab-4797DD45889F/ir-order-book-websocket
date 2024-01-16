@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 
+var cancellationToken = new CancellationToken();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,31 +25,45 @@ var app = builder.Build();
 
 app.UseWebSockets();
 
+var wsConnections = new List<WebSocket>();
+
+async Task Broadcast(string message)
+{
+    var bytes = Encoding.UTF8.GetBytes(message);
+    var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
+
+    foreach (var socket in wsConnections)
+    {
+        if (socket.State == WebSocketState.Open)
+        {
+            await socket.SendAsync(arraySegment, WebSocketMessageType.Text, true, cancellationToken);
+        }
+    }
+}
+
+/*
+ *
+         else if (ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted)
+        {
+            break;
+        }
+*
+ */
+
 app.Map("/ws", async context =>
 {
-    Console.WriteLine("Some websocket related event registered");
-
     if (context.WebSockets.IsWebSocketRequest)
     {
-        using var ws = await context.WebSockets.AcceptWebSocketAsync();
+        var username = context.Request.Query["name"];
 
-        while (true)
-        {
-            var message = $"The current time is {DateTimeOffset.Now}";
-            var bytes = Encoding.UTF8.GetBytes(message);
-            var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
-            if (ws.State == WebSocketState.Open)
-            {
-                await ws.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
-            }
-            else if (ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted)
-            {
-                break;
-            }
+        Console.WriteLine("Some websocket related event registered");
+        var ws = await context.WebSockets.AcceptWebSocketAsync();
 
-            Thread.Sleep(1000);
-        }
-        Console.WriteLine("ws client disconnected");
+        wsConnections.Add(ws);
+
+        await Broadcast($"{username} jointed the room");
+        await Broadcast($"{wsConnections.Count} users connected");
+        await ws.ReceiveAsync(new ArraySegment<byte>(new byte[1024]), cancellationToken);
     }
     else
     {
@@ -55,12 +71,6 @@ app.Map("/ws", async context =>
     }
 });
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 
@@ -88,7 +98,21 @@ app.MapGet("/weatherforecast", () =>
     .WithOpenApi();
 
 
-await app.RunAsync();
+Task.Run(async () =>
+{
+    while (!cancellationToken.IsCancellationRequested)
+    {
+        var message = $"The current time is {DateTimeOffset.Now}";
+
+        Console.WriteLine($"Sending message to {wsConnections.Count}");
+
+        await Broadcast(message);
+
+        Thread.Sleep(1000);
+    }
+});
+
+await app.RunAsync(cancellationToken);
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
