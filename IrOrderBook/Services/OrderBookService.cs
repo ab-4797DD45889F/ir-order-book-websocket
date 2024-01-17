@@ -13,7 +13,7 @@ public class OrderBookService
         }
 
         // make sure that primary and secondary currency codes match for left and right order books, because otherwise we can't calculate the difference
-        if (left.Primary != right.Primary || left.Secondary != right.Secondary)
+        if (left.Pair != right.Pair)
         {
             throw new ArgumentException("Primary and Secondary currency codes do not match for the left and right order books");
         }
@@ -21,8 +21,7 @@ public class OrderBookService
         var diff = new OrderBookDifference();
         diff.Nonce = index;
 
-        diff.Primary = left.Primary;
-        diff.Secondary = right.Primary;
+        diff.Pair = left.Pair;
         diff.BuyOrders = GetDifferenceForCollection(left.BuyOrders, right.BuyOrders);
         diff.SellOrders = GetDifferenceForCollection(left.SellOrders, right.SellOrders);
         return diff;
@@ -56,4 +55,60 @@ public class OrderBookService
         var differenceSet = difference.Select(p => new OrderBookDtoItem { Price = p.Key, Volume = p.Value }).ToArray();
         return differenceSet;
     }
+
+    // todo: this has been proposed by the AI assistance, need to check and adopt
+
+    public OrderBookDto ReconstructRightWithDifference(OrderBookDto left, OrderBookDifference difference)
+    {
+        // make sure that left and difference are not null
+        if (left == null || difference == null)
+        {
+            throw new ArgumentException("Both left and difference must be not null");
+        }
+
+        // make sure that primary and secondary currency codes match for left and difference, because otherwise we can't reconstruct the right order book
+        if (left.Pair != difference.Pair)
+        {
+            throw new ArgumentException("Primary and Secondary currency codes do not match for the left order book and difference");
+        }
+
+        var right = new OrderBookDto();
+        right.Pair = left.Pair;
+        right.BuyOrders = ReconstructCollectionWithDifference(left.BuyOrders, difference.BuyOrders);
+        right.SellOrders = ReconstructCollectionWithDifference(left.SellOrders, difference.SellOrders);
+        return right;
+    }
+
+    private OrderBookDtoItem[] ReconstructCollectionWithDifference(OrderBookDtoItem[] leftOrders, OrderBookDtoItem[] diffOrders)
+    {
+        var leftDict = leftOrders.ToDictionary(x => x.Price, x => x.Volume);
+        var diffDict = diffOrders.ToDictionary(x => x.Price, x => x.Volume);
+        /*
+         * because diff = rightVolume - leftVolume
+         * to calculate rightVolume we can rearrange the formula and get
+         * rightVolume = diff + leftVolume
+         */
+        var right = new Dictionary<decimal, decimal>();
+        // we need to consider all prices that are in 'leftOrders' or 'diffOrders'
+        foreach (var price in leftDict.Keys.Union(diffDict.Keys))
+        {
+            var leftVolume = leftDict.GetValueOrDefault(price, 0);
+            var diff = diffDict.GetValueOrDefault(price, 0);
+
+            var rightVolume = diff + leftVolume;
+
+            // we assume there can't be a negative volume in 'rightOrders'
+            if (rightVolume > 0)
+            {
+                right.Add(price, rightVolume);
+            }
+        }
+
+        // Convert the right dictionary back to a set of Orders
+        var rightSet = right.Select(p => new OrderBookDtoItem { Price = p.Key, Volume = p.Value }).ToArray();
+        return rightSet;
+    }
+
+    // todo: add unit tests for the methods
+
 }

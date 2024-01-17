@@ -1,6 +1,5 @@
 ﻿using IndependentReserve.DotNetClientApi.Data;
 using IrOrderBook.Data;
-using System.Text.Json;
 using IrOrderBook.Extensions;
 using IrOrderBook.Interfaces;
 
@@ -41,7 +40,7 @@ public class SingleOrderBookTrackingService
     private OrderBookDto _currentOrderBookDto;
 
     private string PairName => $"{_primary}{_secondary}";
-    private string OrderBookDifferenceChannelName => $"{PairName}Diff";
+    private string OrderBookDifferenceChannelName => $"{PairName}";
 
     /// <summary>
     /// This service tracks single pair (for instance Xbt/Aud) order book, and broadcasts updates.
@@ -130,12 +129,9 @@ public class SingleOrderBookTrackingService
 
             _currentOrderBookDto = newOrderBookDto;
 
-            // Console.WriteLine($"{difference}\n");
-
-
             // todo: this should probably be broadcast in async form, but we will return to this later
             // broadcast difference object as JSON
-            var differenceJson = JsonSerializer.Serialize(difference);
+            var differenceJson = difference.ToJson();
             _broadcastService.Broadcast(OrderBookDifferenceChannelName, differenceJson);
         }
     }

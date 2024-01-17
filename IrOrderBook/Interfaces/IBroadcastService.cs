@@ -2,5 +2,5 @@
 
 public interface IBroadcastService
 {
-    void Broadcast(string channelName, string message);
+    Task Broadcast(string channelName, string message);
 }

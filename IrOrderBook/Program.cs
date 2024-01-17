@@ -8,7 +8,6 @@ var broadcastService = new ConsoleBroadcastService(); // this will be the real w
 
 var trackingService = new SingleOrderBookTrackingService(primary, secondary, broadcastService);
 
-
 var cts = new CancellationTokenSource();
 
 await trackingService.Start(cts.Token);
@@ -22,4 +21,3 @@ cts.Cancel();
 // todo: potential optimisation is to track only first pages of the order book
 
 // todo: create a web project a that will have an endpoint to return the order book dto and that will broadcast diffrence via websockets
-

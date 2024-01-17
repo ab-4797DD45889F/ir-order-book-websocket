@@ -1,8 +1,9 @@
 using System.Net;
-using System.Net.WebSockets;
-using System.Text;
-
-var cancellationToken = new CancellationToken();
+using IndependentReserve.DotNetClientApi.Data;
+using IrOrderBook.Extensions;
+using IrOrderBook.Interfaces;
+using IrOrderBook.Services;
+using IrOrderBookWebApplication.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,51 +20,29 @@ builder.Services.AddSwaggerGen();
 // todo: read more on how websockets work, maintain websockets better, broadcast order book updates
 // todo: doesn't seem we get event when the client disconnects
 // todo: add some framework like vuejs and layout the order book, add some animation for when rows are added or deleted
-// todo: remove forecast thing
+
+// todo: probably rework websockets towards SignalR
 
 var app = builder.Build();
 
+// todo: limit allowed origins to ir.com
 app.UseWebSockets();
 
-var wsConnections = new List<WebSocket>();
+const CurrencyCode primary = CurrencyCode.Xbt;
+const CurrencyCode secondary = CurrencyCode.Aud;
+var cts = new CancellationTokenSource();
+var cancellationToken = cts.Token;
+var clientConnectionService = new ClientConnectionService(cancellationToken);
 
-async Task Broadcast(string message)
-{
-    var bytes = Encoding.UTF8.GetBytes(message);
-    var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
-
-    foreach (var socket in wsConnections)
-    {
-        if (socket.State == WebSocketState.Open)
-        {
-            await socket.SendAsync(arraySegment, WebSocketMessageType.Text, true, cancellationToken);
-        }
-    }
-}
-
-/*
- *
-         else if (ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted)
-        {
-            break;
-        }
-*
- */
+var trackingService = new SingleOrderBookTrackingService(primary, secondary, (IBroadcastService)clientConnectionService);
+trackingService.Start(cancellationToken);
 
 app.Map("/ws", async context =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
-        var username = context.Request.Query["name"];
-
-        Console.WriteLine("Some websocket related event registered");
-        var ws = await context.WebSockets.AcceptWebSocketAsync();
-
-        wsConnections.Add(ws);
-
-        await Broadcast($"{username} jointed the room");
-        await Broadcast($"{wsConnections.Count} users connected");
-        await ws.ReceiveAsync(new ArraySegment<byte>(new byte[1024]), cancellationToken);
+        // if we support more order books - we will get necessary order book service by channel name which is XbtAud for example
+        await clientConnectionService.Register(context, (channelName) => trackingService.GetOrderBook().ToJson());
     }
     else
     {
@@ -71,50 +50,19 @@ app.Map("/ws", async context =>
     }
 });
 
+// todo: add an endpoint that would return order book
+// todo: implement js code to calculate order book based on the order book + difference
+// todo: next step is build SPA, that would let choose market from the dropdown
 
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
-
-
-Task.Run(async () =>
-{
-    while (!cancellationToken.IsCancellationRequested)
-    {
-        var message = $"The current time is {DateTimeOffset.Now}";
-
-        Console.WriteLine($"Sending message to {wsConnections.Count}");
-
-        await Broadcast(message);
-
-        Thread.Sleep(1000);
-    }
-});
-
 await app.RunAsync(cancellationToken);
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+Console.WriteLine("app seems to have been completed, setting the cancellation token");
+
+// todo: this doesn't work, what is the correct way to stop the web application ?
+
+cts.Cancel();

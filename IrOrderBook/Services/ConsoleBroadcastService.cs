@@ -4,7 +4,7 @@ namespace IrOrderBook.Services;
 
 public class ConsoleBroadcastService : IBroadcastService
 {
-    public void Broadcast(string channelName, string message)
+    public async Task Broadcast(string channelName, string message)
     {
         Console.WriteLine($"{channelName} :: {message}\n");
     }

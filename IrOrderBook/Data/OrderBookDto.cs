@@ -15,22 +15,20 @@ public class OrderBookDto
     public long Nonce { get; set; }
 
     /// <summary>
-    /// Primary currency code of the order book.
+    /// Currency Pair of the order book.
     /// </summary>
-    public string Primary { get; set; }
-
-    /// <summary>
-    /// Secondary currency code of the order book.
-    /// </summary>
-    public string Secondary { get; set; }
+    [JsonPropertyName("c")]
+    public string Pair { get; set; }
 
     /// <summary>
     /// The list of available buy orders.
     /// </summary>
+    [JsonPropertyName("b")]
     public OrderBookDtoItem[] BuyOrders { get; set; }
 
     /// <summary>
     /// The list of available sell orders.
     /// </summary>
+    [JsonPropertyName("s")]
     public OrderBookDtoItem[] SellOrders { get; set; }
 }

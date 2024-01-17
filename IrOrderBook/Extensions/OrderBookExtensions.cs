@@ -1,4 +1,5 @@
-﻿using IndependentReserve.DotNetClientApi.Data;
+﻿using System.Text.Json;
+using IndependentReserve.DotNetClientApi.Data;
 using IrOrderBook.Data;
 
 namespace IrOrderBook.Extensions;
@@ -11,8 +12,7 @@ public static class OrderBookExtensions
 
         var dto = new OrderBookDto();
         dto.Nonce = timestamp;
-        dto.Primary = orderBook.PrimaryCurrencyCode.ToString();
-        dto.Secondary = orderBook.SecondaryCurrencyCode.ToString();
+        dto.Pair = $"{orderBook.PrimaryCurrencyCode}{orderBook.SecondaryCurrencyCode}";
         dto.BuyOrders = orderBook.BuyOrders.Select(ToDto).ToArray();
         dto.SellOrders = orderBook.SellOrders.Select(ToDto).ToArray();
         return dto;
@@ -26,4 +26,6 @@ public static class OrderBookExtensions
             , Volume = item.Volume
         };
     }
+
+    public static string ToJson(this object o) => JsonSerializer.Serialize(o);
 }

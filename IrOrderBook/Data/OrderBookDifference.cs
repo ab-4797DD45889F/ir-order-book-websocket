@@ -21,14 +21,7 @@ public class OrderBookDifference
     /// Serialized json doesn't contain this field.
     /// </summary>
     [JsonIgnore]
-    public string Primary { get; set; }
-
-    /// <summary>
-    /// For information purpose only, it is used in ToString method for example.
-    /// Serialized json doesn't contain this field.
-    /// </summary>
-    [JsonIgnore]
-    public string Secondary { get; set; }
+    public string Pair { get; set; }
 
     /// <summary>
     /// This collection describes the difference in buy orders between two order books.
@@ -48,5 +41,5 @@ public class OrderBookDifference
     [JsonPropertyName("s")]
     public OrderBookDtoItem[] SellOrders { get; set; }
 
-    public override string ToString() => $"Diff{Primary}{Secondary}: {Nonce}: {BuyOrders.Length} buy orders and {SellOrders.Length} sell orders";
+    public override string ToString() => $"{Pair}Diff: {Nonce}: {BuyOrders.Length} buy orders and {SellOrders.Length} sell orders";
 }
