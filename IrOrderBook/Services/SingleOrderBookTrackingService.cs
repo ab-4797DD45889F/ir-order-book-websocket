@@ -108,6 +108,8 @@ public class SingleOrderBookTrackingService
                 Console.WriteLine($"update failed for pair {PairName} {ex.Message}");
             }
         }
+
+        Console.WriteLine($"Background job completed: {nameof(UpdateRawOrderBookInfiniteLoop)}");
     }
 
     private async Task TrackChangesInfiniteLoop(CancellationToken cancellationToken)
@@ -134,5 +136,7 @@ public class SingleOrderBookTrackingService
             var differenceJson = difference.ToJson();
             _broadcastService.Broadcast(OrderBookDifferenceChannelName, differenceJson);
         }
+
+        Console.WriteLine($"Background job completed: {nameof(TrackChangesInfiniteLoop)}");
     }
 }

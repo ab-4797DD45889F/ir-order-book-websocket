@@ -17,3 +17,12 @@ XbtAudDiff :: {"Nonce":1705210003,"BuyOrders":[{"Price":63558.83,"Volume":-0.114
 XbtAudDiff :: {"Nonce":1705210004,"BuyOrders":[{"Price":63558.98,"Volume":0.114}],"SellOrders":[{"Price":65040.01,"Volume":0.062},{"Price":65104.84,"Volume":-0.062}]}
 
 ```
+
+## Runnninng in docker
+
+```
+docker build -t irorderbookwebapplication .
+docker run -d -p 8080:8080 -p 8081:8081 --name irorderbook irorderbookwebapplication
+```
+
+todo: support 8081 as ssh port, it doesn't listen to https on 8081 port 

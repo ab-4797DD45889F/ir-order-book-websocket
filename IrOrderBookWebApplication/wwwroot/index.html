@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <title>Independent Resreve order book</title>
 
-    <script src="/js/ir-order-book.js"></script>
+    <script src="/js/OrderBookService.js"></script>
+    <script src="/js/index.js"></script>
 </head>
 <body>
 
-    <h1>Independent Reserve order book</h1>
+    <table style="width: 100%; border: none;">
+        <tr>
+            <td style="width: 50%; vertical-align: top; text-align: right; padding-right: 10px;">
+                <h1>Buy Orders</h1>
+                <div id="buyOrders"></div>
+            </td>
+            <td style="width: 50%; vertical-align: top; padding-left: 10px;">
+                <h1>Sell Orders</h1>
+                <div id="sellOrders"></div>
+            </td>
+        </tr>
+    </table>
 
-    <p>This is to show how order book can be updated via websockets</p>
+    <div id=""></div>
 
     <div id="output"></div>
-
 
     <!-- todo: is it possible to add vue.js support from csdn sources without including it to the project -->
 

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using IndependentReserve.DotNetClientApi.Data;
 
 namespace IrOrderBook.Data;
 
@@ -9,6 +8,9 @@ namespace IrOrderBook.Data;
 /// </summary>
 public class OrderBookDifference
 {
+    [JsonPropertyName("t")]
+    public string Type => "Update";
+
     /// <summary>
     /// The latest order book version.
     /// Order Book [Nonce -1] + Difference [Nonce] = Order Book [Nonce]
@@ -20,7 +22,7 @@ public class OrderBookDifference
     /// For information purpose only, it is used in ToString method for example.
     /// Serialized json doesn't contain this field.
     /// </summary>
-    [JsonIgnore]
+    [JsonPropertyName("c")]
     public string Pair { get; set; }
 
     /// <summary>

@@ -14,13 +14,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\IrOrderBook\IrOrderBook.csproj" />
     </ItemGroup>
-
+	
+	<ItemGroup>
+		<Folder Include="wwwroot\" />
+	</ItemGroup>
+	
 </Project>

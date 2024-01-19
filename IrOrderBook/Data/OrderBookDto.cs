@@ -8,6 +8,9 @@ namespace IrOrderBook.Data;
 /// </summary>
 public class OrderBookDto
 {
+    [JsonPropertyName("t")]
+    public string Type => "OrderBook";
+
     /// <summary>
     /// The version of the order book.
     /// </summary>

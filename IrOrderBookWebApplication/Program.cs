@@ -35,12 +35,22 @@ var cancellationToken = cts.Token;
 var clientConnectionService = new ClientConnectionService(cancellationToken);
 
 var trackingService = new SingleOrderBookTrackingService(primary, secondary, (IBroadcastService)clientConnectionService);
-trackingService.Start(cancellationToken);
+
+var orderBookReady = new ManualResetEvent(false);
+
+Task.Run(async () =>
+{
+    await trackingService.Start(cancellationToken);
+    orderBookReady.Set();
+});
 
 app.Map("/ws", async context =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
+        // we need to wait the order book service to get the first version of the order book, otherwise we will return null to the first client
+        orderBookReady.WaitOne();
+
         // if we support more order books - we will get necessary order book service by channel name which is XbtAud for example
         await clientConnectionService.Register(context, (channelName) => trackingService.GetOrderBook().ToJson());
     }
@@ -51,7 +61,7 @@ app.Map("/ws", async context =>
 });
 
 // todo: add an endpoint that would return order book
-// todo: implement js code to calculate order book based on the order book + difference
+// todo: add an endpoint to get stats
 // todo: next step is build SPA, that would let choose market from the dropdown
 
 app.UseHttpsRedirection();
