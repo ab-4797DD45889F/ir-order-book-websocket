@@ -175,6 +175,3 @@ class OrderBookService {
 
     }
 }
-
-// todo: show only last five records
-// todo: show order book on the page (probably use vue.js)

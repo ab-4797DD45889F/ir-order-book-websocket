@@ -1,3 +1,8 @@
+// todo: representation level (UI) should not be a part of the order book
+// todo: show only last five records
+// todo: show order book on the page (probably use vue.js)
+
+// creating order book service that will track order book changes
 
 const orderBookService = new OrderBookService({
     logContainerId: 'output',
@@ -5,7 +10,9 @@ const orderBookService = new OrderBookService({
     sellOrdersContainerId: 'sellOrders'
 });
 
-// todo: define base url & port automatically
+// define base url & port automatically
 
-//orderBookService.start('XbtAud', 'wss://localhost:7253/ws');
-orderBookService.start('XbtAud', 'ws://127.0.0.1:8080/ws');
+let wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+let wsUrl = `${wsProtocol}://${window.location.host}/ws`;
+
+orderBookService.start('XbtAud', wsUrl);
