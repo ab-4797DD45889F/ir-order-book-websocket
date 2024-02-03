@@ -80,7 +80,7 @@ class OrderBookService {
 
     #iterateOrderBook(left, update) {
 
-        // todo: step update should be exactly 1
+        // todo: step update should be exactly 1 otherwise need to re-connect again
 
         if (!left || !update) {
             throw new Error("Both left and difference must be not null");
@@ -149,9 +149,15 @@ class OrderBookService {
         return result;
     }
 
+    // todo: ui part should be separated
+
     #showOrderBook() {
         this.#showOrderCollection(this.#ui.buyOrdersContainerId, this.#orderBook.b, true);
         this.#showOrderCollection(this.#ui.sellOrdersContainerId, this.#orderBook.s, false);
+    }
+
+    #numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     #showOrderCollection(containerIdentifier, orders, volumeFirst) {
@@ -165,10 +171,12 @@ class OrderBookService {
         element.innerHTML = '';
 
         orders.forEach(order => {
+            const volumeString = order.v.toFixed(8);
+            const priceString = this.#numberWithCommas(order.p.toFixed(2));
             const orderElement = document.createElement('div');
-            orderElement.textContent = volumeFirst
-                ? `${order.v.toFixed(8)} - $${order.p.toFixed(2)}`
-                : `$${order.p.toFixed(2)} - ${order.v.toFixed(8)}`;
+            orderElement.innerHTML = volumeFirst
+                ? `${volumeString} <span class="buy">$${priceString}</span>`
+                : `<span class="sell">$${priceString}</span> ${volumeString}`;
 
             element.appendChild(orderElement);
         });

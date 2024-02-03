@@ -14,5 +14,4 @@ const orderBookService = new OrderBookService({
 
 let wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 let wsUrl = `${wsProtocol}://${window.location.host}/ws`;
-
 orderBookService.start('XbtAud', wsUrl);

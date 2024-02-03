@@ -46,7 +46,7 @@ public class ClientConnectionService : IBroadcastService
         var arraySegment = ToArraySegment(message);
         var connectionsByChannel = _wsConnections.GetOrAdd(channelName, _ => new ConcurrentBag<WebSocket>()).ToArray(); // converting to array so that removing inactive clients will not cause problems
 
-        Console.WriteLine($"{channelName} ({connectionsByChannel.Length} clients) :: {message}\n");
+        // Console.WriteLine($"{channelName} ({connectionsByChannel.Length} clients) :: {message}\n");
 
         foreach (var socket in connectionsByChannel)
         {
