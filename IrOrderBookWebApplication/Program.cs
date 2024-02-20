@@ -25,7 +25,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// todo: limit allowed origins to ir.com
+// todo: limit allowed origins to ir-order-book.8bits.kg
 app.UseWebSockets();
 
 const CurrencyCode primary = CurrencyCode.Xbt;

@@ -23,9 +23,18 @@ public class ClientConnectionService : IBroadcastService
     {
         var channelName = context.Request.Query["channel"];
 
-        // todo: argument validation XbtAudDiff
+        if (string.IsNullOrEmpty(channelName))
+        {
+            throw new ArgumentException("Channel name cannot be null or empty", nameof(channelName));
+        }
 
-        Console.WriteLine("Some websocket related event registered");
+        // for presentation purpose we support only one pair
+        if (channelName != "XbtAud")
+        {
+            throw new ArgumentException($"Unsupported channel name {channelName}", nameof(channelName));
+        }
+
+        Console.WriteLine($"{DateTimeOffset.Now} Some websocket related event registered");
 
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
         var socketFinishedTcs = new TaskCompletionSource<object>(); // todo: still not sure about this
@@ -58,7 +67,7 @@ public class ClientConnectionService : IBroadcastService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception while sending message to connected client {ex.Message}");
+                    Console.WriteLine($"{DateTimeOffset.Now} Exception while sending message to connected client {ex.Message}");
                 }
             }
         }
