@@ -34,7 +34,9 @@ public class ClientConnectionService : IBroadcastService
             throw new ArgumentException($"Unsupported channel name {channelName}", nameof(channelName));
         }
 
-        Console.WriteLine($"{DateTimeOffset.Now} Some websocket related event registered");
+        // getting client's ip address from the context
+        var ipAddress = context?.Connection?.RemoteIpAddress?.ToString() ?? "<hidden>";
+        Console.WriteLine($"{DateTimeOffset.Now} Some websocket related event registered from IP address {ipAddress}");
 
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
         var socketFinishedTcs = new TaskCompletionSource<object>(); // todo: still not sure about this

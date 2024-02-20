@@ -8,14 +8,14 @@ This is a pet project that tracks order book and broadcasts changes every second
 {"t":"Update","n":1707190315,"c":"XbtAud","b":[],"s":[]}
 ```
 
-## TLDR
+## Run locally
 
 ```
 $ docker pull ghcr.io/ab-4797dd45889f/ir-order-book-websocket:latest
 $ docker run -d -p 8080:8080 -p 8081:8081 --name irorderbook ghcr.io/ab-4797dd45889f/ir-order-book-websocket:latest
 ```
 
-## Run in docker
+## Build sources and run in docker
 
 ```
 $ docker build -t ir-order-book-websocket .
