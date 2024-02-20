@@ -35,7 +35,11 @@ public class ClientConnectionService : IBroadcastService
         }
 
         // getting client's ip address from the context
-        var ipAddress = context?.Connection?.RemoteIpAddress?.ToString() ?? "<hidden>";
+        // note that it may come via cloudflare tunnel
+        var ipAddress = context.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                        ?? context?.Connection?.RemoteIpAddress?.ToString()
+                        ?? "<hidden>";
+
         Console.WriteLine($"{DateTimeOffset.Now} Some websocket related event registered from IP address {ipAddress}");
 
         using var socket = await context.WebSockets.AcceptWebSocketAsync();
