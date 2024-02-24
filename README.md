@@ -8,6 +8,22 @@ This is a pet project that tracks order book and broadcasts changes every second
 {"t":"Update","n":1707190315,"c":"XbtAud","b":[],"s":[]}
 ```
 
+## Contribute
+
+You can easily take part in the development and improvement of this project yourself with VS code and devcontaners.
+
+- Assuming you already use VS Code, install `Dev Containers` extension
+- Use the Command Palette (Ctrl + Shift + P) and choose `Dev Containers: Rebuild and Reopen in container`
+- Once the project gets reload in container, open the terminal and run the following commands to start the application
+
+```
+$ dotnet restore
+$ cd ./IrOrderBookWebApplication
+$ dotnet run
+```
+
+Live order book should be availabe by the url http://localhost:5282
+
 ## Run locally
 
 ```
