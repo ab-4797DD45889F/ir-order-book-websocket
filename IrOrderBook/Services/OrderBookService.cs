@@ -4,7 +4,7 @@ namespace IrOrderBook.Services;
 
 public class OrderBookService
 {
-    public OrderBookDifference GetDifference(long index, OrderBookDto left, OrderBookDto right)
+    public OrderBookDifference GetDifference(OrderBookDto left, OrderBookDto right)
     {
         // make sure that left and right are not null
         if (left == null || right == null)
@@ -19,8 +19,7 @@ public class OrderBookService
         }
 
         var diff = new OrderBookDifference();
-        diff.Nonce = index;
-
+        diff.Nonce = right.Nonce;
         diff.Pair = left.Pair;
         diff.BuyOrders = GetDifferenceForCollection(left.BuyOrders, right.BuyOrders);
         diff.SellOrders = GetDifferenceForCollection(left.SellOrders, right.SellOrders);
@@ -56,14 +55,12 @@ public class OrderBookService
         return differenceSet;
     }
 
-    // todo: this has been proposed by the AI assistance, need to check and adopt
-
-    public OrderBookDto ReconstructRightWithDifference(OrderBookDto left, OrderBookDifference difference)
+    public OrderBookDto ApplyDifference(OrderBookDto left, OrderBookDifference difference)
     {
         // make sure that left and difference are not null
         if (left == null || difference == null)
         {
-            throw new ArgumentException("Both left and difference must be not null");
+            throw new ArgumentException("Both left order book and difference must be not null");
         }
 
         // make sure that primary and secondary currency codes match for left and difference, because otherwise we can't reconstruct the right order book
@@ -73,6 +70,7 @@ public class OrderBookService
         }
 
         var right = new OrderBookDto();
+        right.Nonce = difference.Nonce;
         right.Pair = left.Pair;
         right.BuyOrders = ReconstructCollectionWithDifference(left.BuyOrders, difference.BuyOrders);
         right.SellOrders = ReconstructCollectionWithDifference(left.SellOrders, difference.SellOrders);
@@ -84,7 +82,7 @@ public class OrderBookService
         var leftDict = leftOrders.ToDictionary(x => x.Price, x => x.Volume);
         var diffDict = diffOrders.ToDictionary(x => x.Price, x => x.Volume);
         /*
-         * because diff = rightVolume - leftVolume
+         * diff = rightVolume - leftVolume
          * to calculate rightVolume we can rearrange the formula and get
          * rightVolume = diff + leftVolume
          */
@@ -108,7 +106,4 @@ public class OrderBookService
         var rightSet = right.Select(p => new OrderBookDtoItem { Price = p.Key, Volume = p.Value }).ToArray();
         return rightSet;
     }
-
-    // todo: add unit tests for the methods
-
 }

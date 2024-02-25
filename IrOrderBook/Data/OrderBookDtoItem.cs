@@ -12,4 +12,14 @@ public class OrderBookDtoItem
 
     [JsonPropertyName("v")]
     public decimal Volume { get; set; }
+
+    public OrderBookDtoItem()
+    {
+    }
+
+    public OrderBookDtoItem(decimal price, decimal volume)
+    {
+        Price = price;
+        Volume = volume;
+    }
 }

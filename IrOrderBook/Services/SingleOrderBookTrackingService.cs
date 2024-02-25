@@ -127,7 +127,7 @@ public class SingleOrderBookTrackingService
 
             _timestamp++;
             var newOrderBookDto = _rawOrderBook.ToDto(_timestamp);
-            var difference = _orderBookService.GetDifference(_timestamp, _currentOrderBookDto, newOrderBookDto);
+            var difference = _orderBookService.GetDifference(_currentOrderBookDto, newOrderBookDto);
 
             _currentOrderBookDto = newOrderBookDto;
 
