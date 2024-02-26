@@ -21,8 +21,8 @@ public class OrderBookService
         var diff = new OrderBookDifference();
         diff.Nonce = right.Nonce;
         diff.Pair = left.Pair;
-        diff.BuyOrders = GetDifferenceForCollection(left.BuyOrders, right.BuyOrders);
-        diff.SellOrders = GetDifferenceForCollection(left.SellOrders, right.SellOrders);
+        diff.BuyOrders = GetDifferenceForCollection(left.BuyOrders, right.BuyOrders).OrderByDescending(item => item.Price).ToArray();
+        diff.SellOrders = GetDifferenceForCollection(left.SellOrders, right.SellOrders).OrderBy(item => item.Price).ToArray();
         return diff;
     }
 
@@ -72,8 +72,8 @@ public class OrderBookService
         var right = new OrderBookDto();
         right.Nonce = difference.Nonce;
         right.Pair = left.Pair;
-        right.BuyOrders = ReconstructCollectionWithDifference(left.BuyOrders, difference.BuyOrders);
-        right.SellOrders = ReconstructCollectionWithDifference(left.SellOrders, difference.SellOrders);
+        right.BuyOrders = ReconstructCollectionWithDifference(left.BuyOrders, difference.BuyOrders).OrderByDescending(item => item.Price).ToArray();
+        right.SellOrders = ReconstructCollectionWithDifference(left.SellOrders, difference.SellOrders).OrderBy(item => item.Price).ToArray();
         return right;
     }
 

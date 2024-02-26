@@ -9,8 +9,6 @@ public class OrderBookServiceFixture
 {
     private OrderBookService _orderBookService;
 
-    // todo: make strict order of the collections, see what api returns and make the order the same
-
     [SetUp]
     public void Setup()
     {
@@ -82,9 +80,9 @@ public class OrderBookServiceFixture
             , Pair = "XbtAud"
             , BuyOrders = new []
             {
-                new OrderBookDtoItem(77_000m, -3m)
+                new OrderBookDtoItem(79_000m, +1m)
                 , new OrderBookDtoItem(78_000m, +2m)
-                , new OrderBookDtoItem(79_000m, +1m)
+                , new OrderBookDtoItem(77_000m, -3m)
             }
             , SellOrders = new []
             {
@@ -155,9 +153,9 @@ public class OrderBookServiceFixture
             , Pair = "XbtAud"
             , BuyOrders = new []
             {
-                new OrderBookDtoItem(77_000m, -3m)
+                new OrderBookDtoItem(79_000m, +1m)
                 , new OrderBookDtoItem(78_000m, +2m)
-                , new OrderBookDtoItem(79_000m, +1m)
+                , new OrderBookDtoItem(77_000m, -3m)
             }
             , SellOrders = new []
             {
@@ -171,7 +169,7 @@ public class OrderBookServiceFixture
         {
             Nonce = 101
             , Pair = "XbtAud"
-            , BuyOrders = new[] { new OrderBookDtoItem(78_000m, 3m), new OrderBookDtoItem(79_000m, 1m) }
+            , BuyOrders = new[] { new OrderBookDtoItem(79_000m, 1m), new OrderBookDtoItem(78_000m, 3m) }
             , SellOrders = new[] { new OrderBookDtoItem(80_000m, 1m), new OrderBookDtoItem(81_000m, 3m) }
         };
 
@@ -183,7 +181,6 @@ public class OrderBookServiceFixture
         }
     }
 
-
     private void ExpectDifference(OrderBookDifference expectedDifference, OrderBookDifference actualDifference)
     {
         Assert.IsNotNull(expectedDifference, "Expected difference should not be null");
@@ -194,18 +191,18 @@ public class OrderBookServiceFixture
         Assert.IsNotNull(actualDifference.BuyOrders, "Buy orders difference should not be null");
         Assert.IsNotNull(actualDifference.SellOrders, "Sell orders difference should not be null");
 
-        ExpectOrdersCollection(expectedDifference.BuyOrders, actualDifference.BuyOrders);
-        ExpectOrdersCollection(expectedDifference.SellOrders, actualDifference.SellOrders);
+        ExpectOrdersCollection(expectedDifference.BuyOrders, actualDifference.BuyOrders, "Buy orders");
+        ExpectOrdersCollection(expectedDifference.SellOrders, actualDifference.SellOrders, "Sell orders");
     }
 
-    private void ExpectOrdersCollection(OrderBookDtoItem[] expectedOrders, OrderBookDtoItem[] actualOrders)
+    private void ExpectOrdersCollection(IReadOnlyList<OrderBookDtoItem> expectedOrders, IReadOnlyList<OrderBookDtoItem> actualOrders, string description)
     {
-        Assert.That(actualOrders.Length, Is.EqualTo(expectedOrders.Length));
+        Assert.That(actualOrders.Count, Is.EqualTo(expectedOrders.Count), $"Amount of {description} doesn't match");
 
-        for (var i = 0; i < expectedOrders.Length; i++)
+        for (var i = 0; i < expectedOrders.Count; i++)
         {
-            Assert.That(actualOrders[i].Price, Is.EqualTo(expectedOrders[i].Price), $"Price at index {i} should match");
-            Assert.That(actualOrders[i].Volume, Is.EqualTo(expectedOrders[i].Volume), $"Volume at index {i} should match");
+            Assert.That(actualOrders[i].Price, Is.EqualTo(expectedOrders[i].Price), $"{description}: Price at index {i} should match");
+            Assert.That(actualOrders[i].Volume, Is.EqualTo(expectedOrders[i].Volume), $"{description}: Volume at index {i} should match");
         }
     }
 
@@ -219,6 +216,7 @@ public class OrderBookServiceFixture
         Assert.IsNotNull(actualOrderBook.BuyOrders, "Buy orders should not be null");
         Assert.IsNotNull(actualOrderBook.SellOrders, "Sell orders should not be null");
 
-        ExpectOrdersCollection(expectedOrderBook.BuyOrders, actualOrderBook.BuyOrders);
-        ExpectOrdersCollection(expectedOrderBook.SellOrders, actualOrderBook.SellOrders);    }
+        ExpectOrdersCollection(expectedOrderBook.BuyOrders, actualOrderBook.BuyOrders, "Buy orders");
+        ExpectOrdersCollection(expectedOrderBook.SellOrders, actualOrderBook.SellOrders, "Sell orders");
+    }
 }

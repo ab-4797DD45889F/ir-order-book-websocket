@@ -52,10 +52,6 @@ public class SingleOrderBookTrackingService
         _broadcastService = broadcastService;
     }
 
-    // todo: should return order book as of order book items, without order book type etc.
-    // todo: this should update order book in the background
-    // todo: and there should be another infinite loop that would get current order book and calculate difference, and it should not make requests to API
-
     /// <summary>
     /// Returns the current (last known) order book.
     /// </summary>

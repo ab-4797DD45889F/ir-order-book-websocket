@@ -12,9 +12,15 @@ This is a pet project that tracks order book and broadcasts changes every second
 
 You can easily take part in the development and improvement of this project yourself with VS code and devcontaners.
 
+```
+$ git clone https://github.com/ab-4797DD45889F/ir-order-book-websocket.git
+$ cd ir-order-book-websocket
+$ code . 
+```
+
 - Assuming you already use VS Code, install `Dev Containers` extension
 - Use the Command Palette (Ctrl + Shift + P) and choose `Dev Containers: Rebuild and Reopen in container`
-- Once the project gets reload in container, open the terminal and run the following commands to start the application
+- Once the project gets reload in container, open the vscode terminal and run the following commands to start the application
 
 ```
 $ dotnet restore
